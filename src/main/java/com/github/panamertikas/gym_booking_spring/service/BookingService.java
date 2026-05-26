@@ -14,7 +14,7 @@ public class BookingService {
     @Autowired
     private BookingRepository bookingRepository;
 
-    public void add(Booking booking) {
+    public void save(Booking booking) {
         bookingRepository.save(booking);
     }
 
@@ -29,4 +29,6 @@ public class BookingService {
     public List<Booking> findAll() {
         return bookingRepository.findAll();
     }
+
+
 }
