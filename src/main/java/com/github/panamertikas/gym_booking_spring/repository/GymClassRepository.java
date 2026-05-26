@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GymClassRepository extends JpaRepository<GymClass, Long> {
+
+    boolean existsByClassnameAndTrainer(String classname, String trainer);
 }

@@ -47,8 +47,7 @@ public class Booking implements IBookable{
     }
 
     @Override
-    public GymClass getGymclass() {
+    public GymClass getGymClass() {
         return gymClass;
     }
-
 }

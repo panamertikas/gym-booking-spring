@@ -1,6 +1,7 @@
 package com.github.panamertikas.gym_booking_spring.service;
 
 import com.github.panamertikas.gym_booking_spring.model.Member;
+import com.github.panamertikas.gym_booking_spring.repository.BookingRepository;
 import com.github.panamertikas.gym_booking_spring.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,11 +15,20 @@ public class MemberService {
     @Autowired
     private MemberRepository memberRepository;
 
-    public void save (Member member){
+    @Autowired
+    private BookingRepository bookingRepository;
+
+    public void save(Member member) {
+        if (memberRepository.existsByMail(member.getMail())) {
+            throw new RuntimeException("Member with email " + member.getMail() + " already exists!");
+        }
         memberRepository.save(member);
     }
 
-    public void delete (Member member) {
+    public void delete(Member member) {
+        if (bookingRepository.existsByMember(member)) {
+            throw new RuntimeException("Member with email " + member.getMail() + " has active bookings and cannot be deleted!");
+        }
         memberRepository.delete(member);
     }
 

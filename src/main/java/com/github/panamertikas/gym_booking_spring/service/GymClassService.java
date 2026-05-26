@@ -1,6 +1,7 @@
 package com.github.panamertikas.gym_booking_spring.service;
 
 import com.github.panamertikas.gym_booking_spring.model.GymClass;
+import com.github.panamertikas.gym_booking_spring.repository.BookingRepository;
 import com.github.panamertikas.gym_booking_spring.repository.GymClassRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,11 +15,20 @@ public class GymClassService {
     @Autowired
     private GymClassRepository gymClassRepository;
 
-    public void save (GymClass gymClass) {
+    @Autowired
+    private BookingRepository bookingRepository;
+
+    public void save(GymClass gymClass) {
+        if (gymClassRepository.existsByClassnameAndTrainer(gymClass.getClassname(), gymClass.getTrainer())) {
+            throw new RuntimeException("GymClass " + gymClass.getClassname() + " with trainer " + gymClass.getTrainer() + " already exists!");
+        }
         gymClassRepository.save(gymClass);
     }
 
-    public void delete (GymClass gymClass) {
+    public void delete(GymClass gymClass) {
+        if (bookingRepository.existsByGymClass(gymClass)) {
+            throw new RuntimeException("GymClass " + gymClass.getClassname() + " has active bookings and cannot be deleted!");
+        }
         gymClassRepository.delete(gymClass);
     }
 

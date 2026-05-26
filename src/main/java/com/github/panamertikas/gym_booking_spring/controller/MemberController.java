@@ -2,6 +2,7 @@ package com.github.panamertikas.gym_booking_spring.controller;
 
 import com.github.panamertikas.gym_booking_spring.model.Member;
 import com.github.panamertikas.gym_booking_spring.service.MemberService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ public class MemberController {
     private MemberService memberService;
 
     @PostMapping("/members")
-    public void save (@RequestBody Member member){
+    public void save (@Valid @RequestBody Member member){
         memberService.save(member);
     }
 
