@@ -23,7 +23,7 @@ public class GymClass {
 
     @Column(name = "class_name", nullable = false)
     @NotBlank(message = "Class name cannot be blank")
-    private String classname;
+    private String className;
 
     @Column(nullable = false)
     @NotBlank(message = "Trainer cannot be blank")

@@ -19,15 +19,15 @@ public class GymClassService {
     private BookingRepository bookingRepository;
 
     public void save(GymClass gymClass) {
-        if (gymClassRepository.existsByClassnameAndTrainer(gymClass.getClassname(), gymClass.getTrainer())) {
-            throw new RuntimeException("GymClass " + gymClass.getClassname() + " with trainer " + gymClass.getTrainer() + " already exists!");
+        if (gymClassRepository.existsByClassNameAndTrainer(gymClass.getClassName(), gymClass.getTrainer())) {
+            throw new RuntimeException("GymClass " + gymClass.getClassName() + " with trainer " + gymClass.getTrainer() + " already exists!");
         }
         gymClassRepository.save(gymClass);
     }
 
     public void delete(GymClass gymClass) {
         if (bookingRepository.existsByGymClass(gymClass)) {
-            throw new RuntimeException("GymClass " + gymClass.getClassname() + " has active bookings and cannot be deleted!");
+            throw new RuntimeException("GymClass " + gymClass.getClassName() + " has active bookings and cannot be deleted!");
         }
         gymClassRepository.delete(gymClass);
     }

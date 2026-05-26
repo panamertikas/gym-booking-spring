@@ -31,11 +31,11 @@ public class BookingService {
                 .orElseThrow(() -> new RuntimeException("Member not found!"));
 
         if (bookingRepository.existsByMemberAndGymClass(member, gymClass)) {
-            throw new RuntimeException("Member " + member.getMail() + " already has a booking for " + gymClass.getClassname());
+            throw new RuntimeException("Member " + member.getMail() + " already has a booking for " + gymClass.getClassName());
         }
 
         if (gymClass.getCurrentCapacity() >= gymClass.getMaxCapacity()) {
-            throw new RuntimeException("GymClass " + gymClass.getClassname() + " is full!");
+            throw new RuntimeException("GymClass " + gymClass.getClassName() + " is full!");
         }
 
         gymClass.setCurrentCapacity(gymClass.getCurrentCapacity() + 1);
