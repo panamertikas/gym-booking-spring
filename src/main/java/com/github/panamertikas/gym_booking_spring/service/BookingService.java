@@ -24,10 +24,10 @@ public class BookingService {
     @Autowired
     private BookingRepository bookingRepository;
 
-    public void save(Booking booking) {
-        GymClass gymClass = gymClassRepository.findById(booking.getGymClass().getId())
+    public void save(Booking booking, Long gymClassId, Long memberId) {
+        GymClass gymClass = gymClassRepository.findById(gymClassId)
                 .orElseThrow(() -> new RuntimeException("GymClass not found!"));
-        Member member = memberRepository.findById(booking.getMember().getId())
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("Member not found!"));
 
         if (bookingRepository.existsByMemberAndGymClass(member, gymClass)) {

@@ -1,12 +1,15 @@
 package com.github.panamertikas.gym_booking_spring.controller;
 
+import com.github.panamertikas.gym_booking_spring.dto.BookingMapper;
+import com.github.panamertikas.gym_booking_spring.dto.BookingRequestDTO;
+import com.github.panamertikas.gym_booking_spring.dto.BookingResponseDTO;
 import com.github.panamertikas.gym_booking_spring.model.Booking;
 import com.github.panamertikas.gym_booking_spring.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/api")
@@ -16,8 +19,10 @@ public class BookingController {
     private BookingService bookingService;
 
     @PostMapping("/bookings")
-    public void save(@RequestBody Booking booking) {
-        bookingService.save(booking);
+    public BookingResponseDTO save(@RequestBody BookingRequestDTO dto) {
+        Booking booking = BookingMapper.toEntity(dto);
+        bookingService.save(booking, dto.getGymClassId(), dto.getMemberId());
+        return BookingMapper.toResponseDTO(booking);
     }
 
     @DeleteMapping("/bookings/{id}")
@@ -26,12 +31,17 @@ public class BookingController {
     }
 
     @GetMapping("/bookings/{id}")
-    public Optional<Booking> findById(@PathVariable Long id) {
-        return bookingService.findById(id);
+    public BookingResponseDTO findById(@PathVariable Long id) {
+        return bookingService.findById(id)
+                .map(BookingMapper::toResponseDTO)
+                .orElseThrow(() -> new RuntimeException("Booking not found!"));
     }
 
     @GetMapping("/bookings")
-    public List<Booking> findAll() {
-        return bookingService.findAll();
+    public List<BookingResponseDTO> findAll() {
+        return bookingService.findAll()
+                .stream()
+                .map(BookingMapper::toResponseDTO)
+                .toList();
     }
 }
