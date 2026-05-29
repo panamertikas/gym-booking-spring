@@ -2,7 +2,10 @@ package com.github.panamertikas.gym_booking_spring.controller;
 
 import com.github.panamertikas.gym_booking_spring.dto.AuthRequestDTO;
 import com.github.panamertikas.gym_booking_spring.dto.AuthResponseDTO;
+import com.github.panamertikas.gym_booking_spring.model.Member;
+import com.github.panamertikas.gym_booking_spring.model.MembershipType;
 import com.github.panamertikas.gym_booking_spring.model.User;
+import com.github.panamertikas.gym_booking_spring.repository.MemberRepository;
 import com.github.panamertikas.gym_booking_spring.repository.UserRepository;
 import com.github.panamertikas.gym_booking_spring.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,9 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private MemberRepository memberRepository;
+
     /**
      * Registers a new user.
      * @param dto the registration request containing username and password
@@ -40,11 +46,24 @@ public class AuthController {
         if (userRepository.existsByUsername(dto.getUsername())) {
             throw new RuntimeException("Username already exists!");
         }
+
+        // Create Member
+        Member member = new Member();
+        member.setFirstname(dto.getFirstname());
+        member.setLastname(dto.getLastname());
+        member.setMail(dto.getUsername());
+        member.setAge(dto.getAge());
+        member.setMembershipType(MembershipType.DAILY);
+        memberRepository.save(member);
+
+        // Create User
         User user = new User();
         user.setUsername(dto.getUsername());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRole("USER");
+        user.setMember(member);
         userRepository.save(user);
+
         return "User registered successfully!";
     }
 
@@ -61,4 +80,6 @@ public class AuthController {
         String token = jwtUtil.generateToken(dto.getUsername());
         return new AuthResponseDTO(token);
     }
+
+
 }

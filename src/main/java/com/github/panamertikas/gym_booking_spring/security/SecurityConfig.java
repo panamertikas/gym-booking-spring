@@ -33,7 +33,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/", "/index.html", "/gymclasses.html", "/bookings.html").permitAll()
+                        .requestMatchers("/", "/index.html", "/gymclasses.html", "/bookings.html", "/login.html").permitAll()
+                        .requestMatchers("/api/members/**").hasRole("ADMIN")
+                        .requestMatchers("/api/gym_classes/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/api/bookings/**").hasAnyRole("ADMIN", "USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
