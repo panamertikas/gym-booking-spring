@@ -11,6 +11,7 @@ import com.github.panamertikas.gym_booking_spring.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -81,5 +82,9 @@ public class AuthController {
         return new AuthResponseDTO(token);
     }
 
-
+    @GetMapping("/me")
+    public Object me(Authentication authentication) {
+        if (authentication == null) return "No authentication - anonymous user";
+        return authentication.getAuthorities().toString();
+    }
 }
