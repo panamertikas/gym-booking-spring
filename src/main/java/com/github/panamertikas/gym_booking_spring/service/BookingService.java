@@ -30,8 +30,8 @@ public class BookingService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("Member not found!"));
 
-        if (bookingRepository.existsByMemberAndGymClass(member, gymClass)) {
-            throw new RuntimeException("Member " + member.getMail() + " already has a booking for " + gymClass.getClassName());
+        if (bookingRepository.existsByMemberAndGymClassAndDate(member, gymClass, booking.getDate())) {
+            throw new RuntimeException("Member " + member.getMail() + " already has a booking for " + gymClass.getClassName() + " on " + booking.getDate());
         }
 
         if (gymClass.getCurrentCapacity() >= gymClass.getMaxCapacity()) {
@@ -57,6 +57,7 @@ public class BookingService {
     public List<Booking> findAll() {
         return bookingRepository.findAll();
     }
+
 
 
 }

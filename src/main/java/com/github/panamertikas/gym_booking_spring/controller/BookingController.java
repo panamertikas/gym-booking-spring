@@ -4,8 +4,10 @@ import com.github.panamertikas.gym_booking_spring.dto.BookingMapper;
 import com.github.panamertikas.gym_booking_spring.dto.BookingRequestDTO;
 import com.github.panamertikas.gym_booking_spring.dto.BookingResponseDTO;
 import com.github.panamertikas.gym_booking_spring.model.Booking;
+import com.github.panamertikas.gym_booking_spring.model.GymClass;
 import com.github.panamertikas.gym_booking_spring.model.User;
 import com.github.panamertikas.gym_booking_spring.repository.BookingRepository;
+import com.github.panamertikas.gym_booking_spring.repository.GymClassRepository;
 import com.github.panamertikas.gym_booking_spring.repository.UserRepository;
 import com.github.panamertikas.gym_booking_spring.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ public class BookingController {
 
     @Autowired
     private BookingRepository bookingRepository;
+
+    @Autowired
+    private GymClassRepository gymClassRepository;
 
     @PostMapping("/bookings")
     public BookingResponseDTO save(@RequestBody BookingRequestDTO dto) {
@@ -68,5 +73,13 @@ public class BookingController {
                 .stream()
                 .map(BookingMapper::toResponseDTO)
                 .toList();
+    }
+
+    @GetMapping("/bookings/availability/{gymClassId}/{date}")
+    public boolean checkAvailability(@PathVariable Long gymClassId, @PathVariable String date) {
+        GymClass gymClass = gymClassRepository.findById(gymClassId)
+                .orElseThrow(() -> new RuntimeException("GymClass not found!"));
+        long bookings = bookingRepository.countByGymClassAndDate(gymClass, date);
+        return bookings < gymClass.getMaxCapacity();
     }
 }

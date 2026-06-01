@@ -34,9 +34,11 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/", "/index.html", "/gymclasses.html", "/bookings.html", "/login.html").permitAll()
+                        .requestMatchers("/", "/index.html", "/gymclasses.html", "/bookings.html", "/login.html", "/dashboard.html").permitAll()
+                        .requestMatchers("/api/members/me").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/api/members/**").hasRole("ADMIN")
                         .requestMatchers("/api/gym_classes/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/api/bookings/availability/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/api/bookings/**").hasAnyRole("ADMIN", "USER")
                         .anyRequest().authenticated()
                 )
