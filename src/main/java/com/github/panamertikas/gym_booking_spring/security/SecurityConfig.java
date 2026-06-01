@@ -34,13 +34,15 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/", "/index.html", "/gymclasses.html", "/bookings.html", "/login.html", "/dashboard.html").permitAll()
+                        .requestMatchers("/", "/index.html", "/gymclasses.html", "/bookings.html", "/login.html", "/dashboard.html", "/my-bookings.html").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/gym_classes/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/members/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/bookings/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/api/members/me").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/api/members/**").hasRole("ADMIN")
                         .requestMatchers("/api/gym_classes/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/api/bookings/availability/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/api/bookings/**").hasAnyRole("ADMIN", "USER")
-                        .requestMatchers("/", "/index.html", "/gymclasses.html", "/bookings.html", "/login.html", "/dashboard.html", "/my-bookings.html").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

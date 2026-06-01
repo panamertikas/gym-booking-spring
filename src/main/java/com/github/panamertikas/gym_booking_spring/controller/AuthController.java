@@ -78,8 +78,10 @@ public class AuthController {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword())
         );
-        String token = jwtUtil.generateToken(dto.getUsername());
-        return new AuthResponseDTO(token);
+        User user = userRepository.findByUsername(dto.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found!"));
+        String token = jwtUtil.generateToken(dto.getUsername(), user.getRole());
+        return new AuthResponseDTO(token, user.getRole());
     }
 
     @GetMapping("/me")
