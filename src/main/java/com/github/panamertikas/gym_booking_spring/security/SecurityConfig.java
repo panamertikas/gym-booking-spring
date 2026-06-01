@@ -39,10 +39,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/members/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/bookings/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/api/members/me").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.PUT, "/api/members/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/api/members/**").hasRole("ADMIN")
                         .requestMatchers("/api/gym_classes/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/api/bookings/availability/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/api/bookings/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/", "/index.html", "/gymclasses.html", "/bookings.html", "/login.html", "/dashboard.html", "/my-bookings.html", "/profile.html").permitAll()
+                        .requestMatchers("/", "/index.html", "/gymclasses.html", "/bookings.html", "/login.html", "/dashboard.html", "/my-bookings.html", "/profile.html", "/register-member.html").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

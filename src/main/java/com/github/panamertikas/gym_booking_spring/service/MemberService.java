@@ -32,6 +32,17 @@ public class MemberService {
         memberRepository.delete(member);
     }
 
+    public void update(Long id, Member updatedMember) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Member not found!"));
+        member.setFirstname(updatedMember.getFirstname());
+        member.setLastname(updatedMember.getLastname());
+        member.setMail(updatedMember.getMail());
+        member.setAge(updatedMember.getAge());
+        member.setMembershipType(updatedMember.getMembershipType());
+        memberRepository.save(member);
+    }
+
     public Optional<Member> findById(Long id) {
         return memberRepository.findById(id);
     }

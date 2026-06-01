@@ -36,6 +36,15 @@ public class MemberController {
         memberService.findById(id).ifPresent(memberService::delete);
     }
 
+    @PutMapping("/members/{id}")
+    public MemberResponseDTO update(@PathVariable Long id, @Valid @RequestBody MemberRequestDTO dto) {
+        Member updatedMember = MemberMapper.toEntity(dto);
+        memberService.update(id, updatedMember);
+        return memberService.findById(id)
+                .map(MemberMapper::toResponseDTO)
+                .orElseThrow(() -> new RuntimeException("Member not found!"));
+    }
+
     @GetMapping("/members/{id}")
     public MemberResponseDTO findById(@PathVariable Long id) {
         return memberService.findById(id)
