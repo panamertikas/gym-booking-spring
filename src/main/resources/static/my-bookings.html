@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymBooking - My Bookings</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }
+        nav { background-color: #333; padding: 15px; }
+        nav a { color: white; text-decoration: none; margin-right: 20px; font-size: 16px; }
+        nav a:hover { color: #ffcc00; }
+        .container { max-width: 900px; margin: 30px auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { color: #333; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #333; color: white; }
+        button { padding: 8px 15px; background-color: #333; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px; }
+        button:hover { background-color: #ffcc00; color: #333; }
+        .delete-btn { background-color: #dc3545; }
+        .delete-btn:hover { background-color: #c82333; color: white; }
+        #message { margin-top: 15px; padding: 10px; border-radius: 4px; display: none; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        #time-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 1000; min-width: 300px; }
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+        select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; }
+    </style>
+</head>
+<body>
+<nav>
+    <a href="dashboard.html">My Dashboard</a>
+    <a href="my-bookings.html">My Bookings</a>
+    <a href="#" onclick="logout()">Logout</a>
+</nav>
+
+<div class="container">
+    <h1>My Bookings</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Class</th>
+            <th>Trainer</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="bookingsBody"></tbody>
+    </table>
+    <div id="message"></div>
+</div>
+
+<div id="overlay" onclick="closeModal()"></div>
+<div id="time-modal">
+    <h3>Change Time</h3>
+    <p id="modal-info"></p>
+    <select id="time-select">
+        <option value="08:00">08:00</option>
+        <option value="09:00">09:00</option>
+        <option value="10:00">10:00</option>
+        <option value="11:00">11:00</option>
+        <option value="12:00">12:00</option>
+        <option value="17:00">17:00</option>
+        <option value="18:00">18:00</option>
+        <option value="19:00">19:00</option>
+        <option value="20:00">20:00</option>
+    </select>
+    <button onclick="confirmUpdate()">Save</button>
+    <button onclick="closeModal()" style="background:#dc3545; margin-left:10px">Cancel</button>
+</div>
+
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = 'login.html';
+
+    let selectedBookingId = null;
+
+    function logout() {
+        localStorage.removeItem('token');
+        window.location.href = 'login.html';
+    }
+
+    async function loadMyBookings() {
+        const response = await fetch('http://localhost:8080/api/bookings/my', {
+            headers: {'Authorization': 'Bearer ' + token}
+        });
+        const bookings = await response.json();
+        const tbody = document.getElementById('bookingsBody');
+        tbody.innerHTML = '';
+
+        if (bookings.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">No bookings found</td></tr>';
+            return;
+        }
+
+        bookings.forEach(booking => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${booking.date}</td>
+                    <td>${booking.time}</td>
+                    <td>${booking.gymClass.className}</td>
+                    <td>${booking.gymClass.trainer}</td>
+                    <td>
+                        <button onclick="openModal(${booking.id}, '${booking.gymClass.className}', '${booking.date}')">Change Time</button>
+                        <button class="delete-btn" onclick="deleteBooking(${booking.id})">Cancel</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function openModal(bookingId, className, date) {
+        selectedBookingId = bookingId;
+        document.getElementById('modal-info').textContent = className + ' — ' + date;
+        document.getElementById('time-modal').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('time-modal').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+    }
+
+    async function confirmUpdate() {
+        const time = document.getElementById('time-select').value;
+
+        const response = await fetch(`http://localhost:8080/api/bookings/${selectedBookingId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ time: time })
+        });
+
+        closeModal();
+
+        if (response.ok) {
+            showMessage('Time updated successfully!', 'success');
+            loadMyBookings();
+        } else {
+            const msg = await response.text();
+            showMessage(msg, 'error');
+        }
+    }
+
+    async function deleteBooking(id) {
+        if (!confirm('Are you sure you want to cancel this booking?')) return;
+
+        const response = await fetch(`http://localhost:8080/api/bookings/${id}`, {
+            method: 'DELETE',
+            headers: {'Authorization': 'Bearer ' + token}
+        });
+
+        if (response.ok) {
+            showMessage('Booking cancelled!', 'success');
+            loadMyBookings();
+        } else {
+            const msg = await response.text();
+            showMessage(msg, 'error');
+        }
+    }
+
+    function showMessage(msg, type) {
+        const el = document.getElementById('message');
+        el.textContent = msg;
+        el.className = type;
+        el.style.display = 'block';
+        setTimeout(() => el.style.display = 'none', 3000);
+    }
+
+    loadMyBookings();
+</script>
+</body>
+</html>

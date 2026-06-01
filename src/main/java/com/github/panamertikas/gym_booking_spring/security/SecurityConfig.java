@@ -40,6 +40,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/gym_classes/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/api/bookings/availability/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/api/bookings/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/", "/index.html", "/gymclasses.html", "/bookings.html", "/login.html", "/dashboard.html", "/my-bookings.html").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

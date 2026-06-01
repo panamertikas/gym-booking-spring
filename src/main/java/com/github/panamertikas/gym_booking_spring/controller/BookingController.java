@@ -44,6 +44,15 @@ public class BookingController {
         bookingService.findById(id).ifPresent(bookingService::delete);
     }
 
+    @PutMapping("/bookings/{id}")
+    public BookingResponseDTO update(@PathVariable Long id, @RequestBody BookingRequestDTO dto) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found!"));
+        booking.setTime(dto.getTime());
+        bookingRepository.save(booking);
+        return BookingMapper.toResponseDTO(booking);
+    }
+
     @GetMapping("/bookings/{id}")
     public BookingResponseDTO findById(@PathVariable Long id) {
         return bookingService.findById(id)

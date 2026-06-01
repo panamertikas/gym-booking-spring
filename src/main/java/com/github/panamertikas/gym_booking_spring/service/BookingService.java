@@ -50,6 +50,11 @@ public class BookingService {
         bookingRepository.delete(booking);
     }
 
+    public void update(Booking booking, String time) {
+        booking.setTime(time);
+        bookingRepository.save(booking);
+    }
+
     public Optional<Booking> findById(Long id) {
         return bookingRepository.findById(id);
     }
