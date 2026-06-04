@@ -7,10 +7,10 @@ A full-stack gym booking management system built with Spring Boot, Spring Securi
 - Spring Boot 3.5
 - Spring Data JPA / Hibernate
 - Spring Security + JWT
-- MySQL
+- MySQL 8
 - Maven
+- Docker & Docker Compose
 - Swagger / OpenAPI 3
-- HTML/CSS/JavaScript (Frontend)
 
 ## Features
 - JWT Authentication & Authorization
@@ -18,68 +18,61 @@ A full-stack gym booking management system built with Spring Boot, Spring Securi
 - Member management
 - Gym class management
 - Booking management with capacity control
-- User dashboard with calendar booking
 - Swagger API documentation
+- Data initialization on startup
 
-## Prerequisites
-- Java 21
-- MySQL 8
-- Maven
+## Running with Docker (Recommended)
 
-## Setup
+### Prerequisites
+- Docker Desktop
 
-### Database
-1. Create a MySQL database:
-```sql
-CREATE DATABASE gym_booking;
-CREATE USER 'gymbooking_user'@'localhost' IDENTIFIED BY 'your_password';
-GRANT ALL PRIVILEGES ON gym_booking.* TO 'gymbooking_user'@'localhost';
-```
+### Steps
 
-### Application
 1. Clone the repository:
 ```bash
 git clone https://github.com/panamertikas/gym-booking-spring.git
 cd gym-booking-spring
 ```
 
-2. Copy the example properties file:
+2. Start the containers:
 ```bash
-cp src/main/resources/application.properties.example src/main/resources/application.properties
+docker-compose up --build
 ```
 
-3. Edit `application.properties` with your database credentials:
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/gym_booking?serverTimezone=UTC
-spring.datasource.username=gymbooking_user
-spring.datasource.password=your_password
-spring.jpa.hibernate.ddl-auto=update
+3. The API will be available at `http://localhost:8080`
+
+## Running Locally
+
+### Prerequisites
+- Java 21
+- MySQL 8
+- Maven
+
+### Steps
+
+1. Start MySQL and make sure it accepts `root`/`root` credentials
+
+2. Clone the repository:
+```bash
+git clone https://github.com/panamertikas/gym-booking-spring.git
+cd gym-booking-spring
 ```
 
-4. Build and run:
+3. Build and run:
 ```bash
 mvn spring-boot:run
 ```
 
 ## Default Users
-After running the application, create an admin user manually in the database:
-```sql
-INSERT INTO users (username, password, role) 
-VALUES ('admin', '$2a$10$...bcrypt_hash...', 'ADMIN');
-```
+The application automatically creates the following users on startup:
+
+- Admin: `admin` / `admin123`
+- User: `user@gmail.com` / `123456`
 
 ## API Documentation
 Swagger UI available at: `http://localhost:8080/swagger-ui/index.html`
 
-## Frontend
-- `http://localhost:8080/login.html` - Login/Register
-- `http://localhost:8080/index.html` - Members (ADMIN)
-- `http://localhost:8080/gymclasses.html` - Gym Classes (ADMIN)
-- `http://localhost:8080/bookings.html` - All Bookings (ADMIN)
-- `http://localhost:8080/dashboard.html` - User Dashboard
-- `http://localhost:8080/my-bookings.html` - My Bookings (USER)
-- `http://localhost:8080/profile.html` - My Profile (USER)
-
 ## Related Projects
+- [GymBooking React Frontend](https://github.com/panamertikas/gym-booking-react)
 - [GymBooking Console](https://github.com/panamertikas/gym-booking) - Plain Java OOP
 - [GymBooking JDBC](https://github.com/panamertikas/gym-booking-jdbc) - JDBC/JPA
