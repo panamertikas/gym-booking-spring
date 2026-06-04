@@ -1,16 +1,53 @@
-# React + Vite
+# GymBooking React Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A gym booking management system frontend built with React and Vite.
 
-Currently, two official plugins are available:
+## Technologies
+- React 19
+- Vite
+- React Router DOM
+- React DatePicker
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Prerequisites
+- Node.js 18+
+- GymBooking Spring Boot backend running on port 8080
 
-## React Compiler
+## Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Clone the repository:
+```bash
+git clone https://github.com/panamertikas/gym-booking-react.git
+cd gym-booking-react
+```
 
-## Expanding the ESLint configuration
+2. Install dependencies:
+```bash
+npm install
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+3. Run the development server:
+```bash
+npm run dev
+```
+
+4. Open `http://localhost:5173`
+
+## Default Users
+- Admin: `admin` / `admin123`
+- User: register via the login page
+
+## Pages
+
+### Admin
+- `/admin/members` - Members management
+- `/admin/gym-classes` - Gym Classes management
+- `/admin/bookings` - All bookings
+- `/admin/register-member` - Register new member
+
+### User
+- `/dashboard` - Available classes with calendar booking
+- `/my-bookings` - My bookings
+- `/profile` - My profile
+
+## Related Projects
+- [GymBooking Spring Boot API](https://github.com/panamertikas/gym-booking-spring)
