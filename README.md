@@ -21,7 +21,7 @@ A full-stack gym booking management system built with Spring Boot, Spring Securi
 - Swagger API documentation
 - Data initialization on startup
 
-## Running with Docker (Recommended)
+## Running with Docker
 
 ### Prerequisites
 - Docker Desktop
@@ -34,34 +34,17 @@ git clone https://github.com/panamertikas/gym-booking-spring.git
 cd gym-booking-spring
 ```
 
-2. Start the containers:
+2. Stop local MySQL if running (Windows):
+```bash
+net stop MySQL80
+```
+
+3. Start the containers:
 ```bash
 docker-compose up --build
 ```
 
-3. The API will be available at `http://localhost:8080`
-
-## Running Locally
-
-### Prerequisites
-- Java 21
-- MySQL 8
-- Maven
-
-### Steps
-
-1. Start MySQL and make sure it accepts `root`/`root` credentials
-
-2. Clone the repository:
-```bash
-git clone https://github.com/panamertikas/gym-booking-spring.git
-cd gym-booking-spring
-```
-
-3. Build and run:
-```bash
-mvn spring-boot:run
-```
+4. The API will be available at `http://localhost:8080`
 
 ## Default Users
 The application automatically creates the following users on startup:
