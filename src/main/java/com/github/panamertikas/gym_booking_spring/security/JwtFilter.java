@@ -58,4 +58,17 @@ public class JwtFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
+
+    /**
+     * Excludes Swagger and API docs paths from JWT filtering.
+     * @param request the HTTP request
+     * @return true if the filter should be skipped
+     */
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return path.startsWith("/v3/api-docs") ||
+                path.startsWith("/swagger-ui") ||
+                path.startsWith("/webjars");
+    }
 }
