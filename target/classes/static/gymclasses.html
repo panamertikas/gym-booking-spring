@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymBooking - Gym Classes</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }
+        nav { background-color: #333; padding: 15px; }
+        nav a { color: white; text-decoration: none; margin-right: 20px; font-size: 16px; }
+        nav a:hover { color: #ffcc00; }
+        .container { max-width: 900px; margin: 30px auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { color: #333; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #333; color: white; }
+        button { padding: 8px 15px; background-color: #333; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #ffcc00; color: #333; }
+    </style>
+</head>
+<body>
+<nav>
+    <a href="index.html">Members</a>
+    <a href="gymclasses.html">Gym Classes</a>
+    <a href="bookings.html">Bookings</a>
+    <a href="register-member.html">Register Member</a>
+    <a href="#" onclick="logout()">Logout</a>
+</nav>
+
+<div class="container">
+    <h1>Gym Classes</h1>
+    <table id="gymClassesTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Class Name</th>
+            <th>Trainer</th>
+            <th>Current Capacity</th>
+            <th>Max Capacity</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="gymClassesBody"></tbody>
+    </table>
+</div>
+
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = 'login.html';
+
+    document.querySelector('nav').innerHTML += '<a href="#" onclick="logout()">Logout</a>';
+
+    function logout() {
+        localStorage.removeItem('token');
+        window.location.href = 'login.html';
+    }
+
+    async function loadGymClasses() {
+        const response = await fetch('http://localhost:8080/api/gym_classes', {
+            headers: {'Authorization': 'Bearer ' + token}
+        });
+        const classes = await response.json();
+        const tbody = document.getElementById('gymClassesBody');
+        tbody.innerHTML = '';
+        classes.forEach(gymClass => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${gymClass.id}</td>
+                    <td>${gymClass.className}</td>
+                    <td>${gymClass.trainer}</td>
+                    <td>${gymClass.currentCapacity}</td>
+                    <td>${gymClass.maxCapacity}</td>
+                    <td><button onclick="deleteGymClass(${gymClass.id})">Delete</button></td>
+                </tr>
+            `;
+        });
+    }
+
+    async function deleteGymClass(id) {
+        const response = await fetch(`http://localhost:8080/api/gym_classes/${id}`, {
+            method: 'DELETE',
+            headers: {'Authorization': 'Bearer ' + token}
+        });
+        if (!response.ok) {
+            const message = await response.text();
+            alert(message);
+        }
+        loadGymClasses();
+    }
+
+    loadGymClasses();
+</script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymBooking - Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .card {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 350px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #ffcc00;
+            color: #333;
+        }
+        #message {
+            text-align: center;
+            color: red;
+            margin-top: 10px;
+        }
+        .success {
+            color: green !important;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>🏋️ GymBooking</h1>
+    <input type="text" id="username" placeholder="Username"/>
+    <input type="password" id="password" placeholder="Password"/>
+    <button onclick="login()">Login</button>
+    <button onclick="register()">Register</button>
+    <p id="message"></p>
+</div>
+
+<script>
+    async function login() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+    const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username, password})
+    });
+
+    if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('role', data.role);
+
+        if (data.role === 'ADMIN') {
+            window.location.href = 'index.html';
+        } else {
+            window.location.href = 'dashboard.html';
+        }
+    } else {
+        document.getElementById('message').textContent = 'Invalid username or password!';
+    }
+}
+
+    async function register() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        const response = await fetch('http://localhost:8080/api/auth/register', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username, password})
+        });
+
+        if (response.ok) {
+            const msg = document.getElementById('message');
+            msg.textContent = 'Registered successfully! Please login.';
+            msg.classList.add('success');
+        } else {
+            document.getElementById('message').textContent = 'Username already exists!';
+        }
+    }
+</script>
+</body>
+</html>

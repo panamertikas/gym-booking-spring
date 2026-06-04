@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymBooking - Register Member</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }
+        nav { background-color: #333; padding: 15px; }
+        nav a { color: white; text-decoration: none; margin-right: 20px; font-size: 16px; }
+        nav a:hover { color: #ffcc00; }
+        .container { max-width: 700px; margin: 30px auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { color: #333; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { padding: 10px 20px; background-color: #333; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; width: 100%; }
+        button:hover { background-color: #ffcc00; color: #333; }
+        #message { margin-top: 15px; padding: 10px; border-radius: 4px; display: none; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+<nav>
+    <a href="index.html">Members</a>
+    <a href="gymclasses.html">Gym Classes</a>
+    <a href="bookings.html">Bookings</a>
+    <a href="register-member.html">Register Member</a>
+    <a href="#" onclick="logout()">Logout</a>
+</nav>
+
+<div class="container">
+    <h1>Register New Member</h1>
+
+    <div class="form-group">
+        <label>Firstname</label>
+        <input type="text" id="firstname" placeholder="Firstname"/>
+    </div>
+    <div class="form-group">
+        <label>Lastname</label>
+        <input type="text" id="lastname" placeholder="Lastname"/>
+    </div>
+    <div class="form-group">
+        <label>Age</label>
+        <input type="number" id="age" placeholder="Age"/>
+    </div>
+    <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="mail" placeholder="Email"/>
+    </div>
+    <div class="form-group">
+        <label>Membership Type</label>
+        <select id="membershipType">
+            <option value="DAILY">Daily</option>
+            <option value="MONTHLY">Monthly</option>
+            <option value="YEARLY">Yearly</option>
+        </select>
+    </div>
+
+    <button onclick="registerMember()">Register Member</button>
+
+    <div id="message"></div>
+</div>
+
+<script>
+    const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+
+    // Μόνο ADMIN μπορεί να δει αυτή τη σελίδα
+    if (!token || role !== 'ADMIN') {
+        window.location.href = 'login.html';
+    }
+
+    function logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        window.location.href = 'login.html';
+    }
+
+    async function registerMember() {
+        const response = await fetch('http://localhost:8080/api/members', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                firstname: document.getElementById('firstname').value,
+                lastname: document.getElementById('lastname').value,
+                age: parseInt(document.getElementById('age').value),
+                mail: document.getElementById('mail').value,
+                membershipType: document.getElementById('membershipType').value
+            })
+        });
+
+        if (response.ok) {
+            showMessage('Member registered successfully!', 'success');
+            document.getElementById('firstname').value = '';
+            document.getElementById('lastname').value = '';
+            document.getElementById('age').value = '';
+            document.getElementById('mail').value = '';
+        } else {
+            const msg = await response.text();
+            showMessage(msg, 'error');
+        }
+    }
+
+    function showMessage(msg, type) {
+        const el = document.getElementById('message');
+        el.textContent = msg;
+        el.className = type;
+        el.style.display = 'block';
+        setTimeout(() => el.style.display = 'none', 3000);
+    }
+</script>
+</body>
+</html>

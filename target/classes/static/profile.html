@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymBooking - My Profile</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f5f5f5; }
+        nav { background-color: #333; padding: 15px; }
+        nav a { color: white; text-decoration: none; margin-right: 20px; font-size: 16px; }
+        nav a:hover { color: #ffcc00; }
+        .container { max-width: 700px; margin: 30px auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1, h2 { color: #333; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { padding: 10px 20px; background-color: #333; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; margin-top: 10px; }
+        button:hover { background-color: #ffcc00; color: #333; }
+        .danger { background-color: #dc3545; }
+        .danger:hover { background-color: #c82333; color: white; }
+        .success-btn { background-color: #28a745; }
+        .success-btn:hover { background-color: #218838; color: white; }
+        #message { margin-top: 15px; padding: 10px; border-radius: 4px; display: none; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .membership-card { background-color: #f8f9fa; border-radius: 8px; padding: 20px; margin-top: 20px; }
+        .membership-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; font-weight: bold; margin-bottom: 10px; }
+        .DAILY { background-color: #17a2b8; color: white; }
+        .MONTHLY { background-color: #28a745; color: white; }
+        .YEARLY { background-color: #ffc107; color: #333; }
+    </style>
+</head>
+<body>
+<nav>
+    <a href="dashboard.html">My Dashboard</a>
+    <a href="my-bookings.html">My Bookings</a>
+    <a href="profile.html">My Profile</a>
+    <a href="#" onclick="logout()">Logout</a>
+</nav>
+
+<div class="container">
+    <h1>My Profile</h1>
+
+    <div class="form-group">
+        <label>Firstname</label>
+        <input type="text" id="firstname"/>
+    </div>
+    <div class="form-group">
+        <label>Lastname</label>
+        <input type="text" id="lastname"/>
+    </div>
+    <div class="form-group">
+        <label>Age</label>
+        <input type="number" id="age"/>
+    </div>
+    <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="mail"/>
+    </div>
+
+    <button onclick="updateProfile()">Save Changes</button>
+
+    <div class="membership-card">
+        <h2>Membership</h2>
+        <div id="membership-badge" class="membership-badge"></div>
+        <br>
+        <button class="success-btn" onclick="changeMembership('DAILY')">Daily</button>
+        <button class="success-btn" onclick="changeMembership('MONTHLY')">Monthly</button>
+        <button class="success-btn" onclick="changeMembership('YEARLY')">Yearly</button>
+        <button class="danger" onclick="changeMembership(null)">Cancel Membership</button>
+    </div>
+
+    <div id="message"></div>
+</div>
+
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = 'login.html';
+
+    let memberId = null;
+
+    function logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        window.location.href = 'login.html';
+    }
+
+    async function loadProfile() {
+        const response = await fetch('http://localhost:8080/api/members/me', {
+            headers: {'Authorization': 'Bearer ' + token}
+        });
+
+        if (!response.ok) {
+            showMessage('Could not load profile!', 'error');
+            return;
+        }
+
+        const member = await response.json();
+        memberId = member.id;
+
+        document.getElementById('firstname').value = member.firstname;
+        document.getElementById('lastname').value = member.lastname;
+        document.getElementById('age').value = member.age;
+        document.getElementById('mail').value = member.mail;
+
+        const badge = document.getElementById('membership-badge');
+        badge.textContent = member.membershipType || 'No membership';
+        badge.className = 'membership-badge ' + (member.membershipType || '');
+    }
+
+    async function updateProfile() {
+        const response = await fetch(`http://localhost:8080/api/members/${memberId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                firstname: document.getElementById('firstname').value,
+                lastname: document.getElementById('lastname').value,
+                age: parseInt(document.getElementById('age').value),
+                mail: document.getElementById('mail').value,
+                membershipType: document.getElementById('membership-badge').textContent
+            })
+        });
+
+        if (response.ok) {
+            showMessage('Profile updated successfully!', 'success');
+            loadProfile();
+        } else {
+            const msg = await response.text();
+            showMessage(msg, 'error');
+        }
+    }
+
+    async function changeMembership(type) {
+        const response = await fetch(`http://localhost:8080/api/members/${memberId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                firstname: document.getElementById('firstname').value,
+                lastname: document.getElementById('lastname').value,
+                age: parseInt(document.getElementById('age').value),
+                mail: document.getElementById('mail').value,
+                membershipType: type
+            })
+        });
+
+        if (response.ok) {
+            showMessage('Membership updated!', 'success');
+            loadProfile();
+        } else {
+            const msg = await response.text();
+            showMessage(msg, 'error');
+        }
+    }
+
+    function showMessage(msg, type) {
+        const el = document.getElementById('message');
+        el.textContent = msg;
+        el.className = type;
+        el.style.display = 'block';
+        setTimeout(() => el.style.display = 'none', 3000);
+    }
+
+    loadProfile();
+</script>
+</body>
+</html>
