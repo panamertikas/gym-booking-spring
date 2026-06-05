@@ -41,7 +41,7 @@ net stop MySQL80
 
 3. Start the containers:
 ```bash
-docker-compose up --build
+docker-compose up -d
 ```
 
 4. The API will be available at `http://localhost:8080`
